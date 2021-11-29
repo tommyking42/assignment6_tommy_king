@@ -1,0 +1,21 @@
+---
+title: "ESM 206 Assignment 6 Task 2"
+author: "Tommy King"
+date: "11/29/2021"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+# installing necessary packages
+library(janitor)
+library(here)
+library(tidyverse)
+
+# reading in the data and cleaning up/selecting only necessary columns
+conservation_survey <- read_csv(here("data", "conservation_survey.csv")) %>% 
+  clean_names() %>% 
+  select(env_id, pol_or)
+
+```
+
