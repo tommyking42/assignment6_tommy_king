@@ -1,21 +1,83 @@
 ---
-title: "ESM 206 Assignment 6 Task 2"
+title: "Environmentalism as a Source of Political Division"
 author: "Tommy King"
 date: "11/29/2021"
 output: html_document
 ---
 
-```{r setup, include=FALSE}
-knitr::opts_chunk$set(echo = TRUE)
+```{r setup, include=FALSE, message = FALSE, warning = FALSE}
+knitr::opts_chunk$set(echo = FALSE, message = FALSE, warning = FALSE)
 # installing necessary packages
 library(janitor)
 library(here)
 library(tidyverse)
+library(broom)
+library(kableExtra)
 
 # reading in the data and cleaning up/selecting only necessary columns
 conservation_survey <- read_csv(here("data", "conservation_survey.csv")) %>% 
   clean_names() %>% 
   select(env_id, pol_or)
 
+```
+
+```{r}
+# adding a column for political party affiliation for conservatives and liberals and excluding all other affiliations
+survey_clean <- conservation_survey %>% 
+  mutate(pol_party = case_when(
+    pol_or %in% c(1:3) ~ "Conservative", 
+    pol_or %in% c(5:7) ~ "Liberal")
+  ) %>% 
+  mutate(env_id = case_when(
+    env_id == 1 ~ "Yes", 
+         env_id == 2 ~ "No", 
+         env_id == 3 ~ "Unsure"
+         )) %>% 
+  drop_na(pol_party)
+```
+
+```{r}
+# creating a finalized tables that shows the counts and proportions of liberal and conservative survey respondents who consider themselves environmentalists or not. 
+
+party_table <- survey_clean %>% 
+  tabyl(pol_party, env_id)
+
+# Adding counts AND proportions to table
+
+party_props <- party_table %>% 
+  adorn_percentages() %>% 
+  adorn_pct_formatting(digits = 2) %>% 
+  adorn_ns() 
+  
+  # re-order of columnns for "yes, no, unsure" order
+
+party_props <- party_props[,c(1, 4, 2, 3)]
+  
+
+
+# finalizing table for publication
+
+kable(party_props, 
+      caption = str_wrap("Table 1: Political Party Affiliation and Whether or Not they Consider Themselves to be Environmentalists"), 
+      col = c("Political Party", "Yes", "No", "Unsure")) %>% 
+  kable_styling(bootstrap_options = c("striped", "hover"))
+
+
+
+```
+
+```{r}
+# changing data table to chi-square test format
+party_ct <- party_table %>% 
+  column_to_rownames(var = "pol_party")
+```
+
+```{r}
+# Running chi-square test 
+party_ct2 <- chisq.test(party_ct)
+party_ct2
+
+# making chi-square data tidy and readable
+party_tidy <- tidy(party_ct2)
 ```
 
