@@ -1,0 +1,139 @@
+---
+title: "Who is Longer: Female Colorado Checkered Lizards or Female Desert Grassland Lizards? THE GREAT DEBATE ANSWERED"
+author: "Tommy King"
+date: "11/30/2021"
+output: html_document
+---
+
+```{r setup, include=FALSE, message = FALSE, warning = FALSE}
+knitr::opts_chunk$set(echo = FALSE, message = FALSE, warning = FALSE)
+
+#installing necessary packages
+library(tidyverse)
+library(here)
+library(janitor)
+library(lubridate)
+library(dplyr)
+library(kableExtra)
+library(plotly)
+library(broom)
+library(equatiomatic)
+library(effsize)
+```
+
+### Introduction: 
+This report details and visualizes a comparative analysis of the total length of female Colorado Checkered Lizards and Desert Grassland Lizards. In order to explore this question, "the great debate", as it was once dubbed by politicians around the world, we used mean comparison techniques such as t-tests and Cohen's D to determine the effect size and significance of the differences in mean total length for the two species.
+```{r}
+# reading in the data 
+lizards_data_clean <- read_csv(here("data", "lizards.csv")) %>% 
+  clean_names() %>% 
+  
+  
+# selecting only pertinent variables
+  select(spp, total_length, sex) %>% 
+ 
+  
+# isolating female lizards and renaming to full species names
+filter(sex %in% c("f", "F"), 
+       spp %in% c("CNUN", "CNTE")) %>% 
+  mutate(spp = case_when(
+    spp %in% "CNUN" ~ "Desert Grassland Lizard", 
+    spp %in% "CNTE" ~ "Colorado Checkered Lizard"
+  ))
+  
+```
+
+
+```{r}
+# visualizing the data in jitter plot with box plot containing mean and distribution of outliers 
+ggplot(data = lizards_data_clean, 
+       aes(x = spp, y = total_length)) + 
+  geom_jitter(aes(color = spp))  +
+  geom_boxplot(fill = NA, width = 0.5, outlier.color = NA, aes(fill = "black")) +
+  stat_summary(fun = mean, 
+              geom = "point", 
+               shape = 20, 
+               size = 4 
+              ) + 
+  labs(x = "Species", 
+      y = "Total Length (mm)", 
+     title = "Comparison of Length of Female Lizards by Species", 
+       caption = "Figure 1: Female lizard comparison by Total Length(mm) among 
+     Colorado Checkered Lizards and Desert Grassland Lizards. Depicts that 
+     Colorado Checkered Lizards are on average larger in total length than 
+     Desert Grassland Lizards.") + 
+  theme(legend.position = "none")
+
+  
+```
+
+
+
+```{r}
+# new data frame containing relevant statistics for lizard comparison, using previous data frame as base
+ lizard_statistics <- lizards_data_clean %>% 
+  group_by(spp) %>% 
+  # Creating new values for mean, standard deviation, and sample size 
+  summarize(
+    length_mean = round(mean(total_length, na.rm = TRUE), 0), 
+    sd_legnth = round(sd(total_length, na.rm = TRUE), 0 ), 
+    sample_size = n()
+  )
+  
+```
+
+
+
+### Data Table of Female Lizard Statistics Comparison 
+```{r}
+# creating finalized data table to explore relationship between female lizard average length and standard deviation by species 
+
+kable(lizard_statistics, 
+      caption = "Table 1: Lizard Length Statistic Comparison by Species: Total length (mm) mean, standard deviation, and sample size comparison for Female Colorado Checkered Lizards and Desert Grassland Lizards.", 
+      col.names = c("Species", "Mean Length (mm)", "Standard Deviation Length (mm)", "Sample Size")) %>% 
+  kable_styling(
+    bootstrap_options = c("bordered", "striped", "hover")
+  )
+```
+
+```{r}
+# Means comparison using CNUN and CNTE data
+cnun_data <- lizards_data_clean %>% 
+  filter(spp %in% "Desert Grassland Lizard") %>% 
+  drop_na(total_length) %>% 
+  pull(total_length)
+cnte_data <- lizards_data_clean %>% 
+  filter(spp %in% "Colorado Checkered Lizard") %>% 
+  drop_na(total_length) %>% 
+  pull(total_length)
+
+# doing t-test and tidy format of t-test
+lizard_ttest <- t.test(cnun_data, cnte_data)
+lizard_ttest_tidy <- tidy(lizard_ttest)
+
+#Get the means and SD's of each: 
+cnun_mean <- mean(cnun_data)
+cnte_mean <- mean(cnte_data)
+cnun_sd <- sd(cnun_data)
+cnte_sd <- sd(cnte_data)
+```
+
+```{r, include = FALSE}
+# Visualizing t-test using histograms and qqplots.
+hist(cnun_data)
+hist(cnte_data)
+qqnorm(cnun_data)
+qqnorm(cnte_data)
+```
+
+```{r}
+# Cohen's D and mean comparison 
+lizard_cohen <- cohen.d(cnun_data, cnte_data)
+
+```
+
+### Findings Interpretation: 
+On average, female Colorado Checkered Lizards have a larger total length in (mm) than female Desert Grassland Lizards (`r round(cnte_mean,2)` $\pm$ `r round(cnte_sd, 2)` and `r round(cnun_mean,2)` $\pm$ `r round(cnun_sd, 2)` millimeters, respectively; mean $\pm$ 1 standard deviation). While the absolute difference in means is `r round(cnte_mean, 2) - round(cnun_mean, 2)` mm (a `r round((cnte_mean - cnun_mean)/((cnte_mean + cnun_mean)/2)*100, 2)`% difference), the difference in means is significant (Welch's two-sample t-test: t(`r round(lizard_ttest_tidy$parameter,2)`) = `r round(lizard_ttest_tidy$statistic,2)`, p < 0.05), and the effect size is very large due to (Cohen's *d* = `r round(lizard_cohen$estimate,2)`). This indicates that we can be certain that female Colorado Checkered Lizards are larger in total length than female Desert Grassland Lizards.
+
+### Data Citation: 
+ Lightfoot, D. 2017. Lizard pitfall trap data (LTER-II, LTER-III) ver 36. Environmental Data Initiative. https://doi.org/10.6073/pasta/ff37b4cace16a9943575f3fd7067064e 
