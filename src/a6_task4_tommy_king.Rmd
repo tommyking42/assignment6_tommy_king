@@ -1,0 +1,85 @@
+---
+title: "Mono Lake Levels Visualization"
+author: "Tommy King"
+date: "11/30/2021"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = FALSE, warning = FALSE, message = FALSE)
+#installing necessary packages
+library(here)
+library(tidyverse)
+library(janitor)
+library(paletteer)
+library(ggridges)
+library(patternplot)
+library(jpeg)
+library(ggplot2)
+library(scales)
+library(grid)
+
+```
+
+### Introduction: 
+ Mono Lake is a terminal saline lake in Lee Vining, California, northeast of Yosemite National Park in the Pamidu Toiyabe (Sierra Nevada), and is home to the Kootzaduka’a (or Kutzadika’a) Tribe. The following graph depicts the Mono Lake Levels in feet above sea level from 1850 to 2017. Since 1941, diversions of the Lake water to LA County, caused immense levels of lake level drop and we continue to see the ecological impacts today. As the Lake levels continue to drop, due to dangerous diversions of the lake water, it will reach ecologically significant dangerous levels, specifically for the conservation of important sea birds such as grebes and California gulls. 
+```{r}
+#reading in the data and skipping first 5 rows
+mono_lake_levels <- read_csv(here("data", "mono_lake_annual_levels.csv"), skip = 5) %>%
+  clean_names() 
+
+
+# reading in jpeg for graph
+rock = readJPEG(here("data", "rock.jpg"))
+rock = rasterGrob (rock, interpolate = TRUE)
+
+```
+
+```{r, fig.align = "center"}
+pattern_type = list(rock)
+ggplot(data = mono_lake_levels, aes(x = year, y = lake_level_feet_above_sea_level)) +
+geom_line(color = "dodgerblue", size = 1, fill = "dodgerblue")+ 
+  labs(x = "Year", 
+       y = "Lake Level Above Sea Level (Ft)", 
+       title = "Mono Lake Lake Levels Over Time (1850-2017)") +
+ 
+  geom_ribbon(aes(ymin = 6360, ymax = 6377, color = "red"), fill = "tomato2", alpha = 0.5)+
+  geom_hline(yintercept = 6377, linetype = 2, color = "red") + 
+  geom_label(x = 1875, 
+            y = 6372,
+             size = 3,
+             label = "Land Bridge Emerges", 
+            color = "red") +
+  
+  geom_ribbon(aes(ymin = 6350, ymax = 6360, color = "purple"), fill = "darkorchid1", alpha = 0.5) +
+  geom_hline(yintercept = 6360, linetype = 2, color = "purple") + 
+   geom_label(x = 1900, 
+            y = 6355,
+             size = 3,
+             label = "Salinity rises to 120 g/L", 
+            color = "purple") +
+  
+  geom_ribbon(aes(ymin= 6340, ymax = 6350), fill = "deepskyblue", alpha = 0.5)+
+  geom_hline(yintercept = 6350, linetype = 2, color = "blue4") + 
+    geom_label(x = 1925, 
+            y = 6345,
+             size = 2.5,
+             label = "Acute Salinity Levels (150 g/L)", 
+            color = "deepskyblue") + 
+  geom_point(aes(x = 1941, y = 6417, size = 5), color = "red", shape = 18) +
+  geom_label(x = 1960, y = 6425, size = 3, label = "1941: Lake Diversions Begin") + 
+  
+  theme(legend.position = "none")
+  
+  
+```
+
+**Figure 1: Dropping Mono Lake Levels over Time:** From 1850 to 2017,
+      Mono Lake levels have been consistently dropping, especially due to lake water 
+      diversions to LA county, beginning in 1941.As the lake level continues to drop, 
+      it will reach dangerous levels, highlighted in red, purple, and blue. 
+      Specifically, at 6,377 feet above sea level, a land bridge will emerge between the 
+      islands and the mainland, allowing predators like coyotes to access important bird species. 
+      At 6,360 feet above sea level, salinity levels will rise to 120 g/L,
+      which will affect food for grebes and California gulls. 
+      Lastly, at 6,350 feet above sea level, acute salinity levels of 150 g/L will be reached. "
