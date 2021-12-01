@@ -5,6 +5,8 @@ date: "11/29/2021"
 output: html_document
 ---
 
+### Introduction: 
+This data analysis explores the possibility of association between environmentalism and politics. Specifically, by utilizing Pearson's Chi-squared test, we analyze the correlation and association between political party affiliation and self-identification as environmentalists or not, serving to explore the idea of environmentalism as a source of political division. 
 ```{r setup, include=FALSE, message = FALSE, warning = FALSE}
 knitr::opts_chunk$set(echo = FALSE, message = FALSE, warning = FALSE)
 # installing necessary packages
@@ -75,9 +77,13 @@ party_ct <- party_table %>%
 ```{r}
 # Running chi-square test 
 party_ct2 <- chisq.test(party_ct)
-party_ct2
+#party_ct2
 
 # making chi-square data tidy and readable
 party_tidy <- tidy(party_ct2)
 ```
+### Data Interpretation and Takeaways: 
+According to this data, there is a significant association between political party association and self-identification of environmentalist, as ($\chi$^2^(`r party_tidy$parameter`) = `r round(party_tidy$statistic,2)`, *p* = `r round(party_tidy$p.value, 3)`). Among the conservatives surveyed, only `r party_props[1,2]` self-identified as environmentalists, while `r party_props[1,3]` stated that they were not environmentalists and `r party_props[1,4]` responded as "unsure". On the other hand, among liberals surveyed, `r party_props[2,2]` self-identified as environmentalists, while `r party_props[2,3]` and `r party_props[2,4]` responded as "no" and/or "unsure". This reflects the significant association displayed between political party association and self-identification as environmentalists and serves to illustrate the political divide of environmentalism.
 
+### Data Citation: 
+Andrews Forest LTER Site and C. Batavia. 2019. Influences on charitable giving for conservation: Online survey data of 1,331 respondents across the US, August 2017 ver 3. Environmental Data Initiative. https://doi.org/10.6073/pasta/926e6270e324a1322a900da14d38b96c
