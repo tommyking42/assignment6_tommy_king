@@ -1,7 +1,6 @@
 ---
-title: "Mono Lake Levels Visualization"
+title: "Mono Lake Level Interpretation over Time"
 author: "Tommy King"
-date: "11/30/2021"
 output: html_document
 ---
 
