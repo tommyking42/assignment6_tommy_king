@@ -1,7 +1,6 @@
 ---
-title: "Who is Longer: Female Colorado Checkered Lizards or Female Desert Grassland Lizards? THE GREAT DEBATE ANSWERED"
+title: "Comparative Analysis of Female Lizard Lengths"
 author: "Tommy King"
-date: "11/30/2021"
 output: html_document
 ---
 
