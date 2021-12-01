@@ -36,50 +36,69 @@ rock = rasterGrob (rock, interpolate = TRUE)
 ```
 
 ```{r, fig.align = "center"}
-pattern_type = list(rock)
+
+# creating finalized graph for mono lake levels from 1850 to 2017
 ggplot(data = mono_lake_levels, aes(x = year, y = lake_level_feet_above_sea_level)) +
 geom_line(color = "dodgerblue", size = 1, fill = "dodgerblue")+ 
   labs(x = "Year", 
        y = "Lake Level Above Sea Level (Ft)", 
        title = "Mono Lake Lake Levels Over Time (1850-2017)") +
- 
-  geom_ribbon(aes(ymin = 6360, ymax = 6377, color = "red"), fill = "tomato2", alpha = 0.5)+
-  geom_hline(yintercept = 6377, linetype = 2, color = "red") + 
-  geom_label(x = 1875, 
-            y = 6372,
+  
+  # adding ribbons for the consecutive dropping lake levels and their significance
+  geom_ribbon(aes(x = year, ymin = 6377, ymax = pmax(lake_level_feet_above_sea_level, 6377)), color = "blue", fill = "deepskyblue4", alpha = 0.5)+
+  
+  geom_hline(yintercept = 6377, linetype = 2, color = "cornflowerblue") + 
+  geom_ribbon(aes(x = year, ymin = 6360, ymax = pmax(lake_level_feet_above_sea_level, 6360)), color = "deepskyblue", fill = "deepskyblue3", alpha = 0.3)+
+  
+  
+  geom_hline(yintercept = 6360, linetype = 2, color = "purple") + 
+  geom_ribbon(aes(x = year, ymin = 6350, ymax = pmax(lake_level_feet_above_sea_level, 6350)), color = "deepskyblue", fill = "deepskyblue2", alpha = 0.2)+
+  
+  
+  geom_hline(yintercept = 6350, linetype = 2, color = "blue4") +
+  geom_ribbon(aes(ymin= -Inf, ymax = pmax(lake_level_feet_above_sea_level, 6350)), fill = "deepskyblue1", alpha = 0.1)+
+   
+  # adding labels to important lake water levels
+    geom_label(x = 1855, 
+            y = 6345,
+             size = 3,
+             label = "Acute Salinity Levels (150 g/L)", 
+            color = "deepskyblue3", 
+            hjust = 0) + 
+  
+  geom_label(x = 1855, 
+            y = 6368.5,
              size = 3,
              label = "Land Bridge Emerges", 
-            color = "red") +
+            color = "blue", 
+            hjust = 0) +
   
-  geom_ribbon(aes(ymin = 6350, ymax = 6360, color = "purple"), fill = "darkorchid1", alpha = 0.5) +
-  geom_hline(yintercept = 6360, linetype = 2, color = "purple") + 
-   geom_label(x = 1900, 
+   geom_label(x = 1855, 
             y = 6355,
              size = 3,
              label = "Salinity rises to 120 g/L", 
-            color = "purple") +
+            color = "purple", 
+            hjust = 0) +
   
-  geom_ribbon(aes(ymin= 6340, ymax = 6350), fill = "deepskyblue", alpha = 0.5)+
-  geom_hline(yintercept = 6350, linetype = 2, color = "blue4") + 
-    geom_label(x = 1925, 
-            y = 6345,
-             size = 2.5,
-             label = "Acute Salinity Levels (150 g/L)", 
-            color = "deepskyblue") + 
+  # adding relevant points to graph for important lake decisions
   geom_point(aes(x = 1941, y = 6417, size = 5), color = "red", shape = 18) +
-  geom_label(x = 1960, y = 6425, size = 3, label = "1941: Lake Diversions Begin") + 
-  
-  theme(legend.position = "none")
+  geom_label(x = 1960, y = 6425, size = 3, label = "1941: Lake Diversions Begin") +
+  geom_point(aes(x = 1994, y = 6374.6, size = 5), color = "red", shape = 18) +
+  geom_label(x = 1994, y = 6370, size = 3, label = "1994: State Water Board Decision 1631") +
+ 
+   # removing legend and increasing y-axis limits
+  theme(legend.position = "none") + 
+  scale_y_continuous(limits = c(6340, 6428))
   
   
 ```
 
 **Figure 1: Dropping Mono Lake Levels over Time:** From 1850 to 2017,
       Mono Lake levels have been consistently dropping, especially due to lake water 
-      diversions to LA county, beginning in 1941.As the lake level continues to drop, 
+      diversions to LA county, beginning in 1941. As the lake level continues to drop, 
       it will reach dangerous levels, highlighted in red, purple, and blue. 
       Specifically, at 6,377 feet above sea level, a land bridge will emerge between the 
       islands and the mainland, allowing predators like coyotes to access important bird species. 
       At 6,360 feet above sea level, salinity levels will rise to 120 g/L,
       which will affect food for grebes and California gulls. 
-      Lastly, at 6,350 feet above sea level, acute salinity levels of 150 g/L will be reached. "
+      Lastly, at 6,350 feet above sea level, acute salinity levels of 150 g/L will be reached. However due to efforts from the Mono Lake Committee and the National Audubon Society, in 1994, State Water Board Decision 1631 was reached to protect Mono Lake from further water diversion. 
