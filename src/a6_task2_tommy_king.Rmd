@@ -1,7 +1,6 @@
 ---
 title: "Environmentalism as a Source of Political Division"
 author: "Tommy King"
-date: "11/29/2021"
 output: html_document
 ---
 
